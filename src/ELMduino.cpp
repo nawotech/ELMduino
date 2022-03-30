@@ -107,16 +107,15 @@ bool ELM327::initializeELM(const char &protocol, const byte &dataTimeout)
 	sendCommand_Blocking(command);
 	delay(100);
 
-	// Try "resume protocol" first (for Sparkfun OBDII board)
-	sprintf(command, "STPO");
-	if (sendCommand_Blocking(command) == ELM_SUCCESS)
-	{
-		if (strstr(payload, "OK") != NULL)
-		{
-			connected = true;
-			return connected;
-		}
-	}
+	// Sparkfun board auto-searches for protocol after requesting a PID
+	// Just request a common PID to start search
+	sprintf(command, "010C");
+	sendCommand_Blocking(command);
+	sendCommand_Blocking(command);
+	sendCommand_Blocking(command);
+	sendCommand_Blocking(command);
+	sendCommand_Blocking(command);
+	return true;
 
 	// Set protocol
 	sprintf(command, TRY_PROT_H_AUTO_SEARCH, protocol);
